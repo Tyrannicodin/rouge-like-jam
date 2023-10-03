@@ -1,8 +1,10 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://temp_sprites/enemies.png" type="Texture" id=1]
 [ext_resource path="res://temp_sprites/background.png" type="Texture" id=2]
 [ext_resource path="res://game/PieceManager.cs" type="Script" id=3]
+[ext_resource path="res://game/managers/MapManager.cs" type="Script" id=4]
+[ext_resource path="res://game/Player.cs" type="Script" id=5]
 
 [sub_resource type="TileSet" id=1]
 0/name = "background.png 0"
@@ -25,9 +27,9 @@ flags = 4
 atlas = ExtResource( 1 )
 region = Rect2( 0, 0, 32, 32 )
 
-[node name="Node2D" type="Node2D"]
+[node name="Root" type="Node2D"]
 
-[node name="Background" type="TileMap" parent="."]
+[node name="Map" type="TileMap" parent="."]
 tile_set = SubResource( 1 )
 cell_size = Vector2( 32, 32 )
 cell_custom_transform = Transform2D( 32, 0, 0, 32, 0, 0 )
@@ -39,13 +41,19 @@ script = ExtResource( 3 )
 enemy_positions = [ Vector2( 5, 5 ), Vector2( 9, 2 ) ]
 
 [node name="Player" type="Sprite" parent="PieceManager"]
+position = Vector2( 16, 16 )
 texture = SubResource( 3 )
-offset = Vector2( 16, 16 )
+script = ExtResource( 5 )
 
 [node name="Button" type="Button" parent="."]
 margin_left = 320.0
 margin_right = 480.0
 margin_bottom = 32.0
 text = "Test the movement"
+
+[node name="Managers" type="Node2D" parent="."]
+
+[node name="MapManager" type="Node2D" parent="Managers"]
+script = ExtResource( 4 )
 
 [connection signal="pressed" from="Button" to="PieceManager" method="Turn"]

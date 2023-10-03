@@ -3,10 +3,6 @@ using System;
 
 public class Enemy : Sprite
 {
-	private const int GRID_WIDTH = 10;
-	private const int GRID_HEIGHT = 10;
-	private const int TILEMAP_SIZE = 32;
-
 	private Vector2 GridPosition = new();
 	private readonly RandomNumberGenerator RNG = new();
 
@@ -20,10 +16,11 @@ public class Enemy : Sprite
 		};
 	}
 
+
 	public bool Move(Vector2 distance, bool use_tween = true)
 	{
 		var new_position = distance + GridPosition;
-		if (new_position.x >= GRID_WIDTH || new_position.y >= GRID_HEIGHT || new_position.x < 0 || new_position.y < 0)
+		if (new_position.x >= MapManager.GRID_WIDTH || new_position.y >= MapManager.GRID_HEIGHT || new_position.x < 0 || new_position.y < 0)
 		{
 			return false;
 		}
@@ -31,12 +28,12 @@ public class Enemy : Sprite
 		if (use_tween)
 		{
 			SceneTreeTween position_tween = CreateTween();
-			position_tween.TweenProperty(this, "position", GridPosition * TILEMAP_SIZE, 1);
+			position_tween.TweenProperty(this, "position", GridPosition * MapManager.TILEMAP_SIZE, 1);
 			position_tween.Play();
 		}
 		else
 		{
-			Position = GridPosition * TILEMAP_SIZE;
+			Position = GridPosition * MapManager.TILEMAP_SIZE;
 		}
 		return true;
 	}
