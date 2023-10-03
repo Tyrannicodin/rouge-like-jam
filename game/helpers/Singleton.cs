@@ -5,7 +5,7 @@ public class Singleton<T> : Node where T : Node
     private static T instance = null;
 
     /// <summary>
-    /// Only accessible in the start function or later
+    /// Only accessible in the ready function or later
     /// </summary>
     public static T Instance
     {
