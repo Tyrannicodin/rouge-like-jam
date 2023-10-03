@@ -24,7 +24,7 @@ public class Singleton<T> : Node where T : Node
 
     public override void _EnterTree()
     {
-        if (instance == null)
+        if (instance != null)
         {
             GD.PrintErr("There is more than one " + typeof(T).Name + " singleton in the scene!");
             return;
