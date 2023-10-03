@@ -9,18 +9,22 @@ public class MapManager : Singleton<MapManager>
 
     private TileMap _map;
 
-    public override void _Ready()
+    public TileMap Map
     {
-        _map = GetNode<TileMap>("/root/Root/Map");
+        get
+        {
+            _map ??= GetNode<TileMap>("/root/Root/Map");
+            return _map;
+        }
     }
 
     public Vector2 MapToWorld(Vector2 mapPos)
     {
         Vector2 halfTile = new(TILEMAP_SIZE / 2, TILEMAP_SIZE / 2);
-        return _map.MapToWorld(mapPos) + halfTile;
+        return Map.MapToWorld(mapPos) + halfTile;
     }
     public Vector2 WorldToMap(Vector2 worldPos)
     {
-        return _map.WorldToMap(worldPos);
+        return Map.WorldToMap(worldPos);
     }
 }

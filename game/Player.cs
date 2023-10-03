@@ -1,5 +1,4 @@
 using Godot;
-using Godot.Collections;
 
 public class Player : Node2D
 {
@@ -12,16 +11,20 @@ public class Player : Node2D
     {
         _mapMgr = MapManager.Instance;
 
-        //_currentMapPos = _mapMgr.WorldToMap(Position);
+        _currentMapPos = _mapMgr.WorldToMap(Position);
     }
 
     public override void _Input(InputEvent @event)
     {
         if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
         {
-            Vector2 mapPos = _mapMgr.WorldToMap(mouseEvent.Position);
+            if (mouseEvent.ButtonIndex != (int)ButtonList.Left) return;
 
-            Move(mapPos, 1);
+            Vector2 mapPos = _mapMgr.WorldToMap(mouseEvent.Position);
+            if (mapPos.x < MapManager.GRID_WIDTH && mapPos.y < MapManager.GRID_HEIGHT)
+            {
+                Move(mapPos, 1);
+            }
         }
     }
 
