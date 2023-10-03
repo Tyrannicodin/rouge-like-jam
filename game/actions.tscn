@@ -1,0 +1,46 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://game/ActionButtons.cs" type="Script" id=2]
+
+[sub_resource type="ButtonGroup" id=1]
+resource_name = "ActionButtons"
+
+[node name="ActionButtons" type="Node2D"]
+script = ExtResource( 2 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="Move" type="Button" parent="."]
+margin_left = 258.0
+margin_top = 380.0
+margin_right = 375.0
+margin_bottom = 432.0
+toggle_mode = true
+group = SubResource( 1 )
+text = "Move"
+icon_align = 1
+
+[node name="Attack" type="Button" parent="."]
+margin_left = 389.0
+margin_top = 381.0
+margin_right = 500.0
+margin_bottom = 435.0
+toggle_mode = true
+group = SubResource( 1 )
+text = "Attack"
+icon_align = 1
+
+[node name="Rotate" type="Button" parent="."]
+margin_left = 518.0
+margin_top = 380.0
+margin_right = 616.0
+margin_bottom = 435.0
+toggle_mode = true
+group = SubResource( 1 )
+text = "Rotate"
+icon_align = 1
+
+[connection signal="pressed" from="Move" to="." method="ChangeSelectedAction" binds= [ "move", false ]]
+[connection signal="pressed" from="Attack" to="." method="ChangeSelectedAction" binds= [ "attack", false ]]
+[connection signal="pressed" from="Rotate" to="." method="ChangeSelectedAction" binds= [ "rotate", false ]]
