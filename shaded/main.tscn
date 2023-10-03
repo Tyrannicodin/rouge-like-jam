@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://game/board.tscn" type="PackedScene" id=1]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+void fragment() {
+	vec4 color = texture(TEXTURE, UV).rgba;
+	COLOR = color;
+	if (color.r == 1.0) {
+		COLOR = vec4(1.0, 0.11, 1.0, 1.0);
+	} else if (color.g == 1.0) {
+		COLOR = vec4(0.0, 0.0, 0.0, 0.0);
+	} else if (color.b == 1.0) {
+		COLOR = vec4(1.0, 1.0, 1.0, 1.0);
+	}
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+
+[node name="Control" type="Node2D"]
+
+[node name="ViewportContainer" type="ViewportContainer" parent="."]
+material = SubResource( 2 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_bottom = 1.0
+
+[node name="Viewport" type="Viewport" parent="ViewportContainer"]
+size = Vector2( 500, 500 )
+handle_input_locally = false
+disable_3d = true
+render_target_update_mode = 3
+
+[node name="Root" parent="ViewportContainer/Viewport" instance=ExtResource( 1 )]
