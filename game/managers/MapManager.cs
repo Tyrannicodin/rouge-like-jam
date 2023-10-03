@@ -13,7 +13,7 @@ public class MapManager : Singleton<MapManager>
     {
         get
         {
-            _map ??= GetNode<TileMap>("/root/Root/Map");
+            _map ??= GetTree().Root.FindNode("Root", true, false).GetNode<TileMap>("Map");
             return _map;
         }
     }
