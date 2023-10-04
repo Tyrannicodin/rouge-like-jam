@@ -26,7 +26,8 @@ shader = SubResource( 1 )
 material = SubResource( 2 )
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_bottom = 1.0
+margin_right = 500.0
+margin_bottom = 500.0
 
 [node name="Viewport" type="Viewport" parent="ViewportContainer"]
 size = Vector2( 500, 500 )
