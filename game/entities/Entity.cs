@@ -1,28 +1,5 @@
+using System.Collections.Generic;
 using Godot;
-using Godot.Collections;
-
-public struct EntityAttributes
-{
-    public int health;
-    public int range;
-    public int damage;
-    public int moveSpeed;
-
-    public EntityAttributes(int health = 1, int range = 1, int damage = 1, int moveSpeed = 1)
-    {
-        this.health = health;
-        this.range = range;
-        this.damage = damage;
-        this.moveSpeed = moveSpeed;
-    }
-}
-
-public struct AssemblyGrid
-{
-    public Vector2 size;
-    public Dictionary<Vector2, Component> components;
-    public Array<Vector2> blockedTiles;
-}
 
 public abstract class Entity : Node2D
 {
@@ -53,7 +30,7 @@ public abstract class Entity : Node2D
     // extension of the ready function for use by child classes
     public virtual void EntityReady() { }
 
-    public void Move(Vector2[] path, float speed)
+    public void Move(List<Vector2> path, float speed)
     {
         // First off just tweening to that location
         SceneTreeTween positionTween = CreateTween();

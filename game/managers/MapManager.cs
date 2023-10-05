@@ -44,7 +44,7 @@ public class MapManager : Singleton<MapManager>
 
         foreach (Vector2 cell in moveableCells)
         {
-            Vector2[] directions = new[] { Vector2.Up, Vector2.Right, Vector2.Down, Vector2.Left };
+            List<Vector2> directions = new() { Vector2.Up, Vector2.Right, Vector2.Down, Vector2.Left };
             foreach (Vector2 direction in directions)
             {
                 if (moveableCells.Contains(cell + direction))
@@ -55,12 +55,12 @@ public class MapManager : Singleton<MapManager>
         }
     }
 
-    public Vector2[] GetPointPath(Vector2 fromMapPos, Vector2 toMapPos)
+    public List<Vector2> GetPointPath(Vector2 fromMapPos, Vector2 toMapPos)
     {
-        return pathfinder.GetPointPath(
+        return new List<Vector2>(pathfinder.GetPointPath(
             pathfinder.GetClosestPoint(fromMapPos),
             pathfinder.GetClosestPoint(toMapPos)
-        );
+        ));
     }
 
     public bool CanMoveToCell(Vector2 mapPos)
@@ -96,12 +96,12 @@ public class MapManager : Singleton<MapManager>
     }
 
     // helpers
-    public static int GetPathDistance(Vector2[] path)
+    public static int GetPathDistance(List<Vector2> path)
     {
         int distance = 0;
-        for (int i = 0; i < path.Length; i++)
+        for (int i = 0; i < path.Count; i++)
         {
-            if (i + 1 >= path.Length) break;
+            if (i + 1 >= path.Count) break;
             distance += (int)path[i].DistanceTo(path[i + 1]);
         }
 
@@ -119,12 +119,12 @@ public class MapManager : Singleton<MapManager>
         return dotProduct == -1;
     }
 
-    public static bool IsPointOnPath(Vector2 point, Vector2[] path)
+    public static bool IsPointOnPath(Vector2 point, List<Vector2> path)
     {
         // Check between every connection on the path.
-        for (int i = 0; i < path.Length; i++)
+        for (int i = 0; i < path.Count; i++)
         {
-            if (i + 1 >= path.Length) break;
+            if (i + 1 >= path.Count) break;
             if (IsPointBetweenPoints(point, path[i], path[i + 1]))
             {
                 return true;
@@ -133,14 +133,14 @@ public class MapManager : Singleton<MapManager>
         return false;
     }
 
-    public static Array<Vector2> PathToPoints(Vector2[] path)
+    public static List<Vector2> PathToPoints(List<Vector2> path)
     {
         // Start by adding the start position
-        Array<Vector2> points = new() { path[0] };
+        List<Vector2> points = new() { path[0] };
 
-        for (int i = 0; i < path.Length; i++)
+        for (int i = 0; i < path.Count; i++)
         {
-            if (i + 1 >= path.Length) break;
+            if (i + 1 >= path.Count) break;
 
             Vector2 current = path[i];
             Vector2 to = path[i + 1];

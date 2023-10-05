@@ -19,7 +19,7 @@ public class Player : Entity
 
             if (withinGrid && canMove && !samePlace && !moving)
             {
-                Vector2[] path = mapMgr.GetPointPath(currentMapPos, targetPos);
+                List<Vector2> path = mapMgr.GetPointPath(currentMapPos, targetPos);
 
                 // @TODO temporary limit to move distance
                 if (MapManager.GetPathDistance(path) > 2)

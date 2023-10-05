@@ -1,6 +1,6 @@
 
+using System.Collections.Generic;
 using Godot;
-using Godot.Collections;
 
 public class EnemyManager : Singleton<EnemyManager>
 {
@@ -8,9 +8,9 @@ public class EnemyManager : Singleton<EnemyManager>
     private MapManager mapMgr;
 
     [Export]
-    public Array<Vector2> enemyPositions = new();
+    public List<Vector2> enemyPositions = new();
 
-    public Array<Enemy> enemies = new();
+    public List<Enemy> enemies = new();
 
     public override void _Ready()
     {
@@ -31,7 +31,7 @@ public class EnemyManager : Singleton<EnemyManager>
         }
     }
 
-    public void MoveEnemies(Vector2[] playerPath)
+    public void MoveEnemies(List<Vector2> playerPath)
     {
         foreach (Enemy enemy in enemies)
         {
@@ -42,7 +42,7 @@ public class EnemyManager : Singleton<EnemyManager>
             // Re-enable it's last position
             mapMgr.SetCellDisabled(enemy.currentMapPos, false);
 
-            Vector2[] path = mapMgr.GetPointPath(enemy.currentMapPos, (Vector2)destination);
+            List<Vector2> path = mapMgr.GetPointPath(enemy.currentMapPos, (Vector2)destination);
             enemy.Move(path, 0.2f);
 
             // Disable the new position
