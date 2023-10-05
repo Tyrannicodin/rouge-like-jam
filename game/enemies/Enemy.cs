@@ -21,32 +21,33 @@ public class Enemy : Entity
 
 	// @TODO for now just returns the new position to move to
 	// Player action is also just vector2 passed in
-	public Vector2 GetAction(Vector2[] playerPath)
+	public Vector2? GetAction(Vector2[] playerPath)
 	{
-		Vector2 destination;
 		Array<Vector2> playerPoints = MapManager.PathToPoints(playerPath);
 
-		while (true)
+		bool CanMoveToLocation(Vector2 location)
 		{
-			Vector2 movement;
+			bool noPlayer = !playerPoints.Contains(location);
+			bool canMove = mapMgr.CanMoveToCell(location);
 
-			Array<Vector2> directions = new(Vector2.Up, Vector2.Right, Vector2.Down, Vector2.Left);
-			directions.Shuffle();
-			movement = directions[0];
+			return noPlayer && canMove;
+		}
 
-			destination = currentMapPos + movement;
-			bool withinX = Mathf.Clamp(destination.x, 0, MapManager.GRID_WIDTH) == destination.x;
-			bool withinY = Mathf.Clamp(destination.y, 0, MapManager.GRID_HEIGHT) == destination.y;
 
-			if (withinX && withinY && !playerPoints.Contains(destination))
+		Array<Vector2> directions = new(Vector2.Up, Vector2.Right, Vector2.Down, Vector2.Left);
+		Array<Vector2> availableDirections = new();
+		foreach (Vector2 direction in directions)
+		{
+			if (CanMoveToLocation(currentMapPos + direction))
 			{
-				break;
+				availableDirections.Add(direction);
 			}
 		}
 
-		GD.Print(destination);
+		if (availableDirections.Count == 0) return null;
+		availableDirections.Shuffle();
 
-		return destination;
+		return currentMapPos + availableDirections[0];
 	}
 
 

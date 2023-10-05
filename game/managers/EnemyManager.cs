@@ -26,6 +26,8 @@ public class EnemyManager : Singleton<EnemyManager>
             };
             enemies.Add(newEnemy);
             AddChild(newEnemy, true);
+            // Disable the new position
+            mapMgr.SetCellDisabled(position, true);
         }
     }
 
@@ -33,15 +35,18 @@ public class EnemyManager : Singleton<EnemyManager>
     {
         foreach (Enemy enemy in enemies)
         {
+
+            var destination = enemy.GetAction(playerPath);
+            if (destination == null) continue;
+
             // Re-enable it's last position
             mapMgr.SetCellDisabled(enemy.currentMapPos, false);
 
-            var destination = enemy.GetAction(playerPath);
-            Vector2[] path = mapMgr.GetPointPath(enemy.currentMapPos, destination);
+            Vector2[] path = mapMgr.GetPointPath(enemy.currentMapPos, (Vector2)destination);
             enemy.Move(path, 0.2f);
 
             // Disable the new position
-            mapMgr.SetCellDisabled(destination, true);
+            mapMgr.SetCellDisabled((Vector2)destination, true);
         }
     }
 
