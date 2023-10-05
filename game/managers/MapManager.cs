@@ -95,6 +95,18 @@ public class MapManager : Singleton<MapManager>
         return Map.WorldToMap(worldPos);
     }
 
+    public List<Vector2> GetValidMoves(Vector2 position, int range)
+    {
+        List<Vector2> valid_moves = new();
+        foreach (Vector2 cell in moveableCells)
+        {
+            if (cell == position) continue;
+            if (!CanMoveToCell(cell) || GetPathDistance(GetPointPath(position, cell)) > range) continue;
+            valid_moves.Add(cell);
+        }
+        return valid_moves;
+    }
+
     // helpers
     public static int GetPathDistance(List<Vector2> path)
     {

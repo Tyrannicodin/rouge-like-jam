@@ -4,13 +4,16 @@ using Godot.Collections;
 
 public class Player : Entity
 {
+    private const int RANGE = 2;
     private Line2D pathLine;
+    private TileMap actionOverlay;
 
     public override void _Ready()
     {
         base._Ready();
 
         pathLine = GetTree().Root.FindNode("Root", true, false).GetNode<Line2D>("PathLine");
+        actionOverlay = GetTree().Root.FindNode("Root", true, false).GetNode<TileMap>("ActionOverlay");
     }
 
     public override void _Input(InputEvent @event)
@@ -30,7 +33,7 @@ public class Player : Entity
                 List<Vector2> path = mapMgr.GetPointPath(currentMapPos, targetPos);
 
                 // @TODO temporary limit to move distance
-                if (MapManager.GetPathDistance(path) > 5 || path.Count == 0)
+                if (MapManager.GetPathDistance(path) > RANGE || path.Count == 0)
                 {
                     return;
                 }
@@ -41,6 +44,7 @@ public class Player : Entity
                     realArray[i] = mapMgr.MapToWorld(path[i]);
                 }
                 pathLine.Points = realArray;
+                actionOverlay.Clear();
                 Move(path, 0.2f);
 
                 EnemyManager.Instance.MoveEnemies(path);
@@ -51,6 +55,8 @@ public class Player : Entity
     protected override void OnMoveFinished()
     {
         base.OnMoveFinished();
+        HighlightMoves();
+
         SceneTreeTimer timer = GetTree().CreateTimer(0.2f);
         timer.Connect("timeout", this, nameof(ClearPoints));
     }
@@ -59,5 +65,13 @@ public class Player : Entity
     {
         if (moving) return;
         pathLine.Points = new Vector2[0];
+    }
+
+    private void HighlightMoves()
+    {
+        foreach (Vector2 cell in mapMgr.GetValidMoves(currentMapPos, RANGE))
+        {
+            actionOverlay.SetCell((int)cell.x, (int)cell.y, 0);
+        }
     }
 }
