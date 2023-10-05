@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using System.Collections.Generic;
 
 public class MapManager : Singleton<MapManager>
@@ -9,9 +10,10 @@ public class MapManager : Singleton<MapManager>
 
     private TileMap _map;
 
-    public readonly AStar2D Pathfinder = new();
+    public readonly AStar2D pathfinder = new();
 
-    HashSet<Vector2> moveableCells = new();
+    public readonly HashSet<Vector2> moveableCells = new();
+    public readonly HashSet<Vector2> disabledCells = new();
 
     public TileMap Map
     {
@@ -29,14 +31,14 @@ public class MapManager : Singleton<MapManager>
 
     public void RecalculatePathfinder()
     {
-        Pathfinder.Clear();
+        pathfinder.Clear();
         moveableCells.Clear();
 
         // Add all cells to pathfinder
         foreach (Vector2 cell in Map.GetUsedCellsById(0))
         {
             moveableCells.Add(cell);
-            Pathfinder.AddPoint(Pathfinder.GetAvailablePointId(), cell);
+            pathfinder.AddPoint(pathfinder.GetAvailablePointId(), cell);
         }
 
 
@@ -47,7 +49,7 @@ public class MapManager : Singleton<MapManager>
             {
                 if (moveableCells.Contains(cell + direction))
                 {
-                    Pathfinder.ConnectPoints(Pathfinder.GetClosestPoint(cell), Pathfinder.GetClosestPoint(cell + direction), false);
+                    pathfinder.ConnectPoints(pathfinder.GetClosestPoint(cell), pathfinder.GetClosestPoint(cell + direction), false);
                 }
             }
         }
@@ -55,15 +57,32 @@ public class MapManager : Singleton<MapManager>
 
     public Vector2[] GetPointPath(Vector2 fromMapPos, Vector2 toMapPos)
     {
-        return Pathfinder.GetPointPath(
-            Pathfinder.GetClosestPoint(fromMapPos),
-            Pathfinder.GetClosestPoint(toMapPos)
+        return pathfinder.GetPointPath(
+            pathfinder.GetClosestPoint(fromMapPos),
+            pathfinder.GetClosestPoint(toMapPos)
         );
     }
 
-    public bool CanMoveToPoint(Vector2 mapPos)
+    public bool CanMoveToCell(Vector2 mapPos)
     {
-        return moveableCells.Contains(mapPos);
+        return moveableCells.Contains(mapPos) && !disabledCells.Contains(mapPos);
+    }
+
+    public void SetCellDisabled(Vector2 mapPos, bool disabled)
+    {
+        // If we are already in the right state, do nothing
+        bool alreadyDisabled = disabledCells.Contains(mapPos);
+        if ((disabled && alreadyDisabled) | !disabled && !alreadyDisabled) return;
+
+        pathfinder.SetPointDisabled(pathfinder.GetClosestPoint(mapPos, true), disabled);
+        if (disabled)
+        {
+            disabledCells.Add(mapPos);
+        }
+        else
+        {
+            disabledCells.Remove(mapPos);
+        }
     }
 
     public Vector2 MapToWorld(Vector2 mapPos)
@@ -74,5 +93,65 @@ public class MapManager : Singleton<MapManager>
     public Vector2 WorldToMap(Vector2 worldPos)
     {
         return Map.WorldToMap(worldPos);
+    }
+
+    // helpers
+    public static int GetPathDistance(Vector2[] path)
+    {
+        int distance = 0;
+        for (int i = 0; i < path.Length; i++)
+        {
+            if (i + 1 >= path.Length) break;
+            distance += (int)path[i].DistanceTo(path[i + 1]);
+        }
+
+        return distance;
+    }
+
+    public static bool IsPointBetweenPoints(Vector2 targetPoint, Vector2 pointA, Vector2 pointB)
+    {
+        Vector2 toA = targetPoint.DirectionTo(pointA);
+        Vector2 toB = targetPoint.DirectionTo(pointB);
+
+        float dotProduct = toA.Dot(toB);
+
+        // If the dot product is 1, the 2 vector angles above are exact opposites. So says google.
+        return dotProduct == -1;
+    }
+
+    public static bool IsPointOnPath(Vector2 point, Vector2[] path)
+    {
+        // Check between every connection on the path.
+        for (int i = 0; i < path.Length; i++)
+        {
+            if (i + 1 >= path.Length) break;
+            if (IsPointBetweenPoints(point, path[i], path[i + 1]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Array<Vector2> PathToPoints(Vector2[] path)
+    {
+        // Start by adding the start position
+        Array<Vector2> points = new() { path[0] };
+
+        for (int i = 0; i < path.Length; i++)
+        {
+            if (i + 1 >= path.Length) break;
+
+            Vector2 current = path[i];
+            Vector2 to = path[i + 1];
+
+            while (current != to)
+            {
+                current = current.MoveToward(to, 1);
+                points.Add(current);
+            }
+        }
+
+        return points;
     }
 }

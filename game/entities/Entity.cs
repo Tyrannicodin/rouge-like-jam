@@ -53,13 +53,11 @@ public abstract class Entity : Node2D
     // extension of the ready function for use by child classes
     public virtual void EntityReady() { }
 
-    public void Move(Vector2 targetPos, float speed)
+    public void Move(Vector2[] path, float speed)
     {
         // First off just tweening to that location
         SceneTreeTween positionTween = CreateTween();
         positionTween.SetTrans(Tween.TransitionType.Linear);
-
-        Vector2[] path = mapMgr.GetPointPath(currentMapPos, targetPos);
         foreach (Vector2 point in path)
         {
             if (point == currentMapPos)

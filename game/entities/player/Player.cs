@@ -14,11 +14,22 @@ public class Player : Entity
             Vector2 targetPos = mapMgr.WorldToMap(mouseEvent.Position);
 
             bool withinGrid = targetPos.x < MapManager.GRID_WIDTH && targetPos.y < MapManager.GRID_HEIGHT;
-            bool canMove = mapMgr.CanMoveToPoint(targetPos);
+            bool canMove = mapMgr.CanMoveToCell(targetPos);
+            bool samePlace = targetPos == currentMapPos;
 
-            if (withinGrid && canMove && !moving)
+            if (withinGrid && canMove && !samePlace && !moving)
             {
-                Move(targetPos, 0.2f);
+                Vector2[] path = mapMgr.GetPointPath(currentMapPos, targetPos);
+
+                // @TODO temporary limit to move distance
+                if (MapManager.GetPathDistance(path) > 2)
+                {
+                    return;
+                }
+
+                Move(path, 0.2f);
+
+                EnemyManager.Instance.MoveEnemies(path);
             }
         }
     }
