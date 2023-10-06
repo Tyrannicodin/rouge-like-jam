@@ -13,6 +13,12 @@ public abstract class Component : Node2D
         Left
     }
 
+    public override void _Ready()
+    {
+        base._Ready();
+        
+    }
+
     public static float EdgeToRotation(Edge edge)
     {
         return edge switch

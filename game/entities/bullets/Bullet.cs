@@ -56,10 +56,4 @@ public class Bullet : Entity
 		}
 		return null;
 	}
-
-	protected override void OnMoveFinished()
-	{
-		base.OnMoveFinished();
-
-	}
 }
