@@ -44,9 +44,6 @@ public class EnemyManager : Singleton<EnemyManager>
 
             List<Vector2> path = mapMgr.GetPointPath(enemy.currentMapPos, (Vector2)destination);
             enemy.Move(path, 0.2f);
-
-            // Disable the new position
-            mapMgr.SetCellDisabled((Vector2)destination, true);
         }
     }
 

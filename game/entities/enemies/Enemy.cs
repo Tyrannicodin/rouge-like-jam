@@ -4,6 +4,8 @@ using Godot.Collections;
 
 public class Enemy : Entity
 {
+	protected override Vector2 ColliderSize => new(16, 15);
+
 	public override void EntityReady()
 	{
 		// Add a sprite as a child
@@ -48,5 +50,11 @@ public class Enemy : Entity
 		availableDirections.Shuffle();
 
 		return currentMapPos + availableDirections[0];
+	}
+
+	protected override void OnMoveFinished()
+	{
+		base.OnMoveFinished();
+		mapMgr.SetCellDisabled(currentMapPos, true);
 	}
 }

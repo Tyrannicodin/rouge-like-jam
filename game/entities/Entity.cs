@@ -19,8 +19,25 @@ public abstract class Entity : Node2D
 
     public AssemblyGrid assemblyGrid;
 
+    protected Area2D collider;
+    protected virtual Vector2 ColliderSize
+    {
+        get { return new(); }
+    }
+
     public override void _Ready()
     {
+        collider = new();
+        CollisionShape2D collider_shape = new()
+        {
+            Shape = new RectangleShape2D()
+            {
+                Extents = ColliderSize / 2
+            }
+        };
+        collider.AddChild(collider_shape);
+        AddChild(collider);
+
         mapMgr = MapManager.Instance;
         currentMapPos = mapMgr.WorldToMap(Position);
 

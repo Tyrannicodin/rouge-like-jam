@@ -12,7 +12,6 @@ public class ShaderPropertyHandler : ViewportContainer
         base._Ready();
         SceneTreeTween tweener = GetTree().CreateTween().SetTrans(Tween.TransitionType.Linear);
         tweener.SetLoops();
-        //GD.Print((Material as ShaderMaterial).GetPropertyList());
         tweener.TweenMethod(this, nameof(SetColor), 0f, 1f, 15, new Godot.Collections.Array { 1 });
         tweener.TweenMethod(this, nameof(SetColor), 1f, 0f, 15, new Godot.Collections.Array { 1 });
         tweener.Play();
