@@ -7,7 +7,6 @@ public class ActionButtons : HBoxContainer
 
     private Button _moveButton;
     private Button _attackButton;
-    private Button _rotateButton;
 
     // none or action id.
     private string _selectedAction = "none";
@@ -17,7 +16,6 @@ public class ActionButtons : HBoxContainer
     {
         _moveButton = GetNode<Button>("Move");
         _attackButton = GetNode<Button>("Attack");
-        _rotateButton = GetNode<Button>("Rotate");
     }
 
     public void ChangeSelectedAction(string actionId, bool noEmit)
@@ -32,9 +30,6 @@ public class ActionButtons : HBoxContainer
                     break;
                 case "attack":
                     _attackButton.Pressed = false;
-                    break;
-                case "rotate":
-                    _rotateButton.Pressed = false;
                     break;
                 default:
                     // Somehow invalid action was sent, do nothing.

@@ -15,21 +15,19 @@ public abstract class Component : Node2D
 
     public static float EdgeToRotation(Edge edge)
     {
-        switch (edge)
+        return edge switch
         {
-            case Edge.Right:
-                return 90;
-            case Edge.Bottom:
-                return 180;
-            case Edge.Left:
-                return 270;
-            default:
-                return 0;
-        }
+            Edge.Right => 90,
+            Edge.Bottom => 180,
+            Edge.Left => 270,
+            _ => (float)0,
+        };
     }
 
     public abstract Edge InputLocation { get; }
     public abstract Edge OutputLocation { get; }
+    public abstract string ComponentName { get; }
+    public abstract string ComponentDescription { get; }
 
     public abstract void ModifyAttributes(ref EntityAttributes attributes);
 
@@ -46,6 +44,12 @@ public class MyFancyComponent : Component
 
     // output is at the top
     public override Edge OutputLocation => Edge.Top;
+
+    // display name is fancy part
+    public override string ComponentName => "Fancy part";
+
+    // describe what it does
+    public override string ComponentDescription => "This component is very shiny!\n+1 movement range";
 
     public override void ModifyAttributes(ref EntityAttributes attributes)
     {

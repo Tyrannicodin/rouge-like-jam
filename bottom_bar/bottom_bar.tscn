@@ -1,9 +1,8 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://game/ActionButtons.cs" type="Script" id=1]
+[ext_resource path="res://bottom_bar/ActionButtons.cs" type="Script" id=1]
 
 [sub_resource type="ButtonGroup" id=1]
-resource_name = "ActionButtons"
 
 [node name="ActionButtons" type="HBoxContainer"]
 script = ExtResource( 1 )
@@ -30,16 +29,5 @@ group = SubResource( 1 )
 text = "Attack"
 icon_align = 1
 
-[node name="Rotate" type="Button" parent="."]
-margin_left = 128.0
-margin_right = 188.0
-margin_bottom = 50.0
-rect_min_size = Vector2( 60, 50 )
-toggle_mode = true
-group = SubResource( 1 )
-text = "Rotate"
-icon_align = 1
-
 [connection signal="pressed" from="Move" to="." method="ChangeSelectedAction" binds= [ "move", false ]]
 [connection signal="pressed" from="Attack" to="." method="ChangeSelectedAction" binds= [ "attack", false ]]
-[connection signal="pressed" from="Rotate" to="." method="ChangeSelectedAction" binds= [ "rotate", false ]]
