@@ -1,9 +1,9 @@
 using Godot;
 using System;
 
-public class ActionButtons : Node2D
+public class ActionButtons : HBoxContainer
 {
-    [Signal] public delegate void OnSelectedActionChanged();
+    [Signal] public delegate void OnSelectedActionChanged(string action);
 
     private Button _moveButton;
     private Button _attackButton;

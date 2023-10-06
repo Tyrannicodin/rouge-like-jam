@@ -4,9 +4,11 @@ using Godot.Collections;
 
 public class Player : Entity
 {
-    private const int RANGE = 2;
+    private const int MOVE_RANGE = 2;
+    private const int ATTACK_RANGE = 3;
     private Line2D pathLine;
     private TileMap actionOverlay;
+    private string currentAction;
 
     public override void _Ready()
     {
@@ -18,7 +20,8 @@ public class Player : Entity
 
     public override void _Input(InputEvent @event)
     {
-        if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
+        if (!(@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)) return;
+        if (currentAction == "move")
         {
             if (mouseEvent.ButtonIndex != (int)ButtonList.Left) return;
 
@@ -33,7 +36,7 @@ public class Player : Entity
                 List<Vector2> path = mapMgr.GetPointPath(currentMapPos, targetPos);
 
                 // @TODO temporary limit to move distance
-                if (MapManager.GetPathDistance(path) > RANGE || path.Count == 0)
+                if (MapManager.GetPathDistance(path) > MOVE_RANGE || path.Count == 0)
                 {
                     return;
                 }
@@ -49,6 +52,27 @@ public class Player : Entity
 
                 EnemyManager.Instance.MoveEnemies(path);
             }
+        }
+        else if (currentAction == "attack")
+        {
+
+        }
+    }
+
+    public void ActionSelected(string action)
+    {
+        actionOverlay.Clear();
+        currentAction = action;
+        switch (currentAction)
+        {
+            case "move":
+                HighlightMoves();
+                break;
+            case "attack":
+                HighlightDirections();
+                break;
+            case "rotate":
+                break;
         }
     }
 
@@ -69,9 +93,22 @@ public class Player : Entity
 
     private void HighlightMoves()
     {
-        foreach (Vector2 cell in mapMgr.GetValidMoves(currentMapPos, RANGE))
+        foreach (Vector2 cell in mapMgr.GetValidMoves(currentMapPos, MOVE_RANGE))
         {
             actionOverlay.SetCell((int)cell.x, (int)cell.y, 0);
+        }
+    }
+
+    private void HighlightDirections()
+    {
+        foreach (Vector2 direction in new Vector2[] { Vector2.Up, Vector2.Down, Vector2.Left, Vector2.Right })
+        {
+            int multiplier = 1;
+            while (multiplier <= ATTACK_RANGE && mapMgr.CanMoveToCell(currentMapPos + direction * multiplier))
+            {
+                actionOverlay.SetCell((int)(currentMapPos + direction * multiplier).x, (int)(currentMapPos + direction * multiplier).y, 0);
+                multiplier++;
+            }
         }
     }
 }

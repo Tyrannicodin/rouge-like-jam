@@ -79,4 +79,9 @@ script = ExtResource( 6 )
 enemyPositions = [ Vector2( 5, 5 ), Vector2( 7, 1 ) ]
 
 [node name="ActionButtons" parent="." instance=ExtResource( 7 )]
-position = Vector2( 16, 332 )
+margin_left = 1.0
+margin_top = 321.0
+margin_right = 189.0
+margin_bottom = 371.0
+
+[connection signal="OnSelectedActionChanged" from="ActionButtons" to="Player" method="ActionSelected"]

@@ -5,37 +5,36 @@
 [sub_resource type="ButtonGroup" id=1]
 resource_name = "ActionButtons"
 
-[node name="ActionButtons" type="Node2D"]
+[node name="ActionButtons" type="HBoxContainer"]
 script = ExtResource( 1 )
 __meta__ = {
 "_editor_description_": ""
 }
 
 [node name="Move" type="Button" parent="."]
-margin_left = 258.0
-margin_top = 380.0
-margin_right = 375.0
-margin_bottom = 432.0
+margin_right = 60.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 60, 50 )
 toggle_mode = true
 group = SubResource( 1 )
 text = "Move"
 icon_align = 1
 
 [node name="Attack" type="Button" parent="."]
-margin_left = 389.0
-margin_top = 381.0
-margin_right = 500.0
-margin_bottom = 435.0
+margin_left = 64.0
+margin_right = 124.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 60, 50 )
 toggle_mode = true
 group = SubResource( 1 )
 text = "Attack"
 icon_align = 1
 
 [node name="Rotate" type="Button" parent="."]
-margin_left = 518.0
-margin_top = 380.0
-margin_right = 616.0
-margin_bottom = 435.0
+margin_left = 128.0
+margin_right = 188.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 60, 50 )
 toggle_mode = true
 group = SubResource( 1 )
 text = "Rotate"
