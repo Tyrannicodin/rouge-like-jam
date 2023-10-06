@@ -13,7 +13,8 @@ public class Enemy : Entity
 			{
 				Atlas = ResourceLoader.Load("res://temp_sprites/enemies.png") as Texture,
 				Region = new Rect2(32, 0, new Vector2(32, 32))
-			}
+			},
+			Scale = new Vector2(0.5f, 0.5f)
 		};
 		AddChild(sprite);
 	}

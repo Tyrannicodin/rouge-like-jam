@@ -1,12 +1,15 @@
 using Godot;
 using Godot.Collections;
+using System;
 using System.Collections.Generic;
 
 public class MapManager : Singleton<MapManager>
 {
     public const int GRID_WIDTH = 10;
     public const int GRID_HEIGHT = 10;
-    public const int TILEMAP_SIZE = 32;
+    public Vector2 TILEMAP_SIZE = new(17, 16);
+
+    private readonly int[] valid_celltypes = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
     private TileMap _map;
 
@@ -29,13 +32,25 @@ public class MapManager : Singleton<MapManager>
         RecalculatePathfinder();
     }
 
+    public List<Vector2> ValidCells()
+    {
+        List<Vector2> cells = new();
+        foreach (int cell_type in valid_celltypes)
+        {
+            foreach (Vector2 cell in Map.GetUsedCellsById(cell_type)) {
+                cells.Add(cell);
+            }
+        }
+        return cells;
+    }
+
     public void RecalculatePathfinder()
     {
         pathfinder.Clear();
         moveableCells.Clear();
 
         // Add all cells to pathfinder
-        foreach (Vector2 cell in Map.GetUsedCellsById(0))
+        foreach (Vector2 cell in ValidCells())
         {
             moveableCells.Add(cell);
             pathfinder.AddPoint(pathfinder.GetAvailablePointId(), cell);
@@ -87,7 +102,7 @@ public class MapManager : Singleton<MapManager>
 
     public Vector2 MapToWorld(Vector2 mapPos)
     {
-        Vector2 halfTile = new(TILEMAP_SIZE / 2, TILEMAP_SIZE / 2);
+        Vector2 halfTile = new(TILEMAP_SIZE.x / 2, TILEMAP_SIZE.y / 2);
         return Map.MapToWorld(mapPos) + halfTile;
     }
     public Vector2 WorldToMap(Vector2 worldPos)

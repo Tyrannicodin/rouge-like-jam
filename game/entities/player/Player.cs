@@ -55,7 +55,7 @@ public class Player : Entity
         }
         else if (currentAction == "attack")
         {
-
+            
         }
     }
 
@@ -104,7 +104,7 @@ public class Player : Entity
         foreach (Vector2 direction in new Vector2[] { Vector2.Up, Vector2.Down, Vector2.Left, Vector2.Right })
         {
             int multiplier = 1;
-            while (multiplier <= ATTACK_RANGE && mapMgr.CanMoveToCell(currentMapPos + direction * multiplier))
+            while (multiplier <= ATTACK_RANGE && mapMgr.moveableCells.Contains(currentMapPos + direction * multiplier))
             {
                 actionOverlay.SetCell((int)(currentMapPos + direction * multiplier).x, (int)(currentMapPos + direction * multiplier).y, 0);
                 multiplier++;
