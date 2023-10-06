@@ -705,6 +705,12 @@ region = Rect2( 32, 32, 32, 32 )
 
 [node name="Root" type="Node2D"]
 
+[node name="ActionButtons" parent="." instance=ExtResource( 7 )]
+margin_left = 1.0
+margin_top = 162.0
+margin_right = 189.0
+margin_bottom = 212.0
+
 [node name="Map" type="TileMap" parent="."]
 tile_set = SubResource( 1 )
 cell_size = Vector2( 17, 16 )
@@ -717,9 +723,10 @@ tile_set = SubResource( 4 )
 cell_size = Vector2( 17, 16 )
 cell_custom_transform = Transform2D( 18, 0, 0, 16, 0, 0 )
 format = 1
+tile_data = PoolIntArray( 589828, 0, 0, 589829, 0, 0, 589830, 0, 0, 589831, 0, 0, 589832, 0, 0, 589833, 0, 0 )
 
 [node name="PathLine" type="Line2D" parent="."]
-width = 4.0
+width = 3.0
 default_color = Color( 1, 0, 0, 1 )
 
 [node name="Player" type="Sprite" parent="."]
@@ -736,11 +743,5 @@ script = ExtResource( 4 )
 [node name="EnemyManager" type="Node2D" parent="Managers"]
 script = ExtResource( 6 )
 enemyPositions = [ Vector2( 5, 5 ), Vector2( 7, 1 ) ]
-
-[node name="ActionButtons" parent="." instance=ExtResource( 7 )]
-margin_left = 1.0
-margin_top = 321.0
-margin_right = 189.0
-margin_bottom = 371.0
 
 [connection signal="OnSelectedActionChanged" from="ActionButtons" to="Player" method="ActionSelected"]
