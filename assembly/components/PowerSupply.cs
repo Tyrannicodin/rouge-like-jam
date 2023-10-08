@@ -2,16 +2,17 @@ using Godot;
 
 public class PowerSupply : Component
 {
-	// input is at the bottom
-	public override Edge InputLocation => Edge.Bottom;
+	public PowerSupply()
+	{
+		GD.Print("PSU created");
+	}
 
-	// output is at the top
-	public override Edge OutputLocation => Edge.Top;
+	public override Edge InputLocation => Edge.Left;
+	public override Edge OutputLocation => Edge.Right;
+	public override bool Supplier => true;
+	public override Vector2 SpritePosition => new(0, 0);
 
-	// display name is fancy part
 	public override string ComponentName => "Power supply";
-
-	// describe what it does
 	public override string ComponentDescription => "Provides power to a circuit";
 
 	public override void ModifyAttributes(ref EntityAttributes attributes)

@@ -19,6 +19,8 @@ public class Bullet : Entity
 				EnemyManager.Instance.enemies.Remove(collidingEntity as Enemy);
 				mapMgr.SetCellDisabled((collidingEntity as Enemy).currentMapPos, false);
 				collidingEntity.QueueFree();
+				BulletManager.Instance.bullets.Remove(collidingEntity as Bullet);
+				collidingEntity.QueueFree();
 			}
 			else if (collidingEntity is Bullet)
 			{

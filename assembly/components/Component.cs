@@ -16,7 +16,17 @@ public abstract class Component : Node2D
     public override void _Ready()
     {
         base._Ready();
-        
+        Position = ComponentManager.Instance.MapToWorld(gridPos);
+        AddChild(new Sprite()
+        {
+            Texture = new AtlasTexture()
+            {
+                //@TODO switch to component spritesheet
+                Atlas = ResourceLoader.Load("res://temp_sprites/enemies.png") as Texture,
+                Region = new(SpritePosition.x, SpritePosition.y, new(32, 32))
+            },
+            Scale = new Vector2(0.5f, 0.5f)
+        });
     }
 
     public static float EdgeToRotation(Edge edge)
@@ -30,8 +40,21 @@ public abstract class Component : Node2D
         };
     }
 
+    public static Vector2 EdgeToDirection(Edge edge)
+    {
+        return edge switch
+        {
+            Edge.Right => Vector2.Right,
+            Edge.Bottom => Vector2.Down,
+            Edge.Left => Vector2.Left,
+            _ => Vector2.Up,
+        };
+    }
+
     public abstract Edge InputLocation { get; }
     public abstract Edge OutputLocation { get; }
+    public abstract bool Supplier { get; }
+    public abstract Vector2 SpritePosition { get; }
     public abstract string ComponentName { get; }
     public abstract string ComponentDescription { get; }
 
@@ -50,6 +73,12 @@ public class MyFancyComponent : Component
 
     // output is at the top
     public override Edge OutputLocation => Edge.Top;
+
+    // does not supply power
+    public override bool Supplier => false;
+
+    // sprite is at 0,0 on the spritesheet
+    public override Vector2 SpritePosition => new(0, 0);
 
     // display name is fancy part
     public override string ComponentName => "Fancy part";
