@@ -5,18 +5,20 @@ using System.Linq;
 
 public class ComponentManager : Singleton<ComponentManager>
 {
-    public const int GRID_WIDTH = 10;
-    public const int GRID_HEIGHT = 10;
+    public const int GRID_WIDTH = 5;
+    public const int GRID_HEIGHT = 5;
     public Vector2 TILEMAP_SIZE = new(17, 17);
 
     private readonly int[] valid_celltypes = new int[] { 0 };
+    private readonly Type[] ignored_component_types = new Type[] { typeof(MyFancyComponent) };
 
     private TileMap _map;
+    private VBoxContainer _component_buttons;
 
     public readonly HashSet<Vector2> componentConnections = new();
     public readonly List<Vector2> moveableCells = new();
-    public List<Component> components = new();
-    public Type[] componentTypes = new[] { typeof(PowerSupply) };
+    public Dictionary<Vector2, Component> components = new();
+    public Type[] componentTypes;
     private int selectedType = -1;
 
     public TileMap Map
@@ -27,10 +29,36 @@ public class ComponentManager : Singleton<ComponentManager>
             return _map;
         }
     }
+    public VBoxContainer ComponentButtons
+    {
+        get
+        {
+            _component_buttons ??= GetTree().Root.FindNode("Components", true, false).GetNode("Components").GetNode<VBoxContainer>("Inner");
+            return _component_buttons;
+        }
+    }
 
     public override void _Ready()
     {
-        RecalculatePathfinder();
+        componentTypes = typeof(Component).Assembly.GetTypes().Where(subType => subType.IsSubclassOf(typeof(Component)) && !ignored_component_types.Contains(subType)).ToArray();
+
+        RecalculatePathfinder(); ;
+        int i = 0;
+        foreach (Type componentType in componentTypes)
+        {
+            // Can't have static virtual types so we create an instance that we discard after the loop
+            Component tempComponent = (Component)componentType.GetConstructor(new Type[0]).Invoke(new object[0]);
+            Button componentButton = new()
+            {
+                Name = componentType.Name,
+                Text = tempComponent.ComponentName,
+                HintTooltip = tempComponent.ComponentDescription,
+                ToggleMode = true
+            };
+            componentButton.Connect("pressed", this, "ComponentTypePicked", new Godot.Collections.Array { i });
+            ComponentButtons.AddChild(componentButton);
+            i++;
+        }
     }
 
     public List<Vector2> ValidCells()
@@ -52,7 +80,6 @@ public class ComponentManager : Singleton<ComponentManager>
         moveableCells.Clear();
         components = new();
 
-        // Add all cells to pathfinder
         foreach (Vector2 cell in ValidCells())
         {
             moveableCells.Add(cell);
@@ -61,7 +88,20 @@ public class ComponentManager : Singleton<ComponentManager>
 
     public void ComponentTypePicked(int idx)
     {
-        selectedType = idx;
+        foreach (Button button in ComponentButtons.GetChildren())
+        {
+            button.Pressed = false;
+        }
+        if (idx == selectedType)
+        {
+            selectedType = -1;
+        }
+        else
+        {
+
+            ComponentButtons.GetChild<Button>(idx).Pressed = true;
+            selectedType = idx;
+        }
     }
 
     public override void _Input(InputEvent @event)
@@ -79,10 +119,11 @@ public class ComponentManager : Singleton<ComponentManager>
 
     public void PlaceComponent(int componentTypeIdx, Vector2 position)
     {
+        if (!moveableCells.Contains(position)) return;
         Component component = (Component)componentTypes[componentTypeIdx].GetConstructor(new Type[0]).Invoke(new object[0]);
         component.gridPos = position;
         AddChild(component);
-        components.Add(component);
+        components.Add(position, component);
         componentConnections.Add(new(
             moveableCells.IndexOf(position),
             moveableCells.IndexOf(position + Component.EdgeToDirection(component.OutputLocation))
@@ -100,10 +141,33 @@ public class ComponentManager : Singleton<ComponentManager>
     public EntityAttributes GetModifications()
     {
         EntityAttributes attributes = new();
-        foreach (Component component in components)
+        List<Component> modifiers = new();
+        foreach (Component component in components.Values)
         {
             if (!component.Supplier) continue;
+            modifiers.Clear();
+            modifiers.Add(component);
 
+            Component currentComponent;
+            bool connected = true;
+            do
+            {
+                currentComponent = components.GetValueOrDefault(
+                    Component.EdgeToDirection(component.OutputLocation) + component.gridPos,
+                    null
+                );
+                if (currentComponent == null)
+                {
+                    connected = false;
+                    break;
+                };
+            } while (currentComponent != component);
+            if (!connected) continue;
+
+            foreach (Component modifiyingComponent in modifiers)
+            {
+                modifiyingComponent.ModifyAttributes(ref attributes);
+            }
         }
         return attributes;
     }

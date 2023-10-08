@@ -2,11 +2,6 @@ using Godot;
 
 public class PowerSupply : Component
 {
-	public PowerSupply()
-	{
-		GD.Print("PSU created");
-	}
-
 	public override Edge InputLocation => Edge.Left;
 	public override Edge OutputLocation => Edge.Right;
 	public override bool Supplier => true;
