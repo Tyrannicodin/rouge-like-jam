@@ -130,14 +130,6 @@ public class ComponentManager : Singleton<ComponentManager>
         ));
     }
 
-    public bool ComponentsConnected(Component component1, Component component2)
-    {
-        if (!(moveableCells.Contains(component1.gridPos) && moveableCells.Contains(component2.gridPos))) return false;
-        IEnumerable<Vector2> component1Connection = componentConnections.Where(connection => moveableCells.IndexOf(component1.gridPos) == connection.x);
-        if (component1Connection.Count() == 0 || component1Connection.First().y != moveableCells.IndexOf(component2.gridPos)) return false;
-        return true;
-    }
-
     public EntityAttributes GetModifications()
     {
         EntityAttributes attributes = new();
@@ -148,19 +140,21 @@ public class ComponentManager : Singleton<ComponentManager>
             modifiers.Clear();
             modifiers.Add(component);
 
-            Component currentComponent;
+            Component currentComponent = component;
+            Vector2 previousEdge;
             bool connected = true;
             do
             {
-                currentComponent = components.GetValueOrDefault(
-                    Component.EdgeToDirection(component.OutputLocation) + component.gridPos,
-                    null
-                );
-                if (currentComponent == null)
+                previousEdge = Component.EdgeToDirection(currentComponent.OutputLocation);
+                if (
+                    !components.ContainsKey(previousEdge + currentComponent.gridPos) ||
+                    previousEdge != -Component.EdgeToDirection(components[previousEdge + currentComponent.gridPos].InputLocation)
+                )
                 {
                     connected = false;
                     break;
                 };
+                currentComponent = components[previousEdge + currentComponent.gridPos];
             } while (currentComponent != component);
             if (!connected) continue;
 
