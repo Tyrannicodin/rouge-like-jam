@@ -43,4 +43,5 @@ render_target_update_mode = 3
 
 [node name="Root" parent="ViewportContainer/Viewport" instance=ExtResource( 1 )]
 
-[node name="Components" parent="." instance=ExtResource( 4 )]
+[node name="Components" parent="ViewportContainer/Viewport" instance=ExtResource( 4 )]
+position = Vector2( 180, 0 )

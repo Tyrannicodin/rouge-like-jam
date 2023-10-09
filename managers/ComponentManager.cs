@@ -119,7 +119,7 @@ public class ComponentManager : Singleton<ComponentManager>
 
     public void PlaceComponent(int componentTypeIdx, Vector2 position)
     {
-        if (!moveableCells.Contains(position)) return;
+        if (!moveableCells.Contains(position) || components.ContainsKey(position)) return;
         Component component = (Component)componentTypes[componentTypeIdx].GetConstructor(new Type[0]).Invoke(new object[0]);
         component.gridPos = position;
         AddChild(component);
@@ -179,6 +179,6 @@ public class ComponentManager : Singleton<ComponentManager>
     }
     public Vector2 WorldToMap(Vector2 worldPos)
     {
-        return Map.WorldToMap(worldPos);
+        return Map.WorldToMap(Map.ToLocal(worldPos));
     }
 }

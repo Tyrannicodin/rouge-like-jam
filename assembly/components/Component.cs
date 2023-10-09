@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Reflection;
 
 
 public abstract class Component : Node2D
@@ -22,7 +23,7 @@ public abstract class Component : Node2D
             Texture = new AtlasTexture()
             {
                 //@TODO switch to component spritesheet
-                Atlas = ResourceLoader.Load("res://temp_sprites/enemies.png") as Texture,
+                Atlas = ResourceLoader.Load<Texture>("res://temp_sprites/enemies.png"),
                 Region = new(SpritePosition.x, SpritePosition.y, new(32, 32))
             },
             Scale = new Vector2(0.5f, 0.5f)
