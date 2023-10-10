@@ -37,7 +37,8 @@ public class MapManager : Singleton<MapManager>
         List<Vector2> cells = new();
         foreach (int cell_type in valid_celltypes)
         {
-            foreach (Vector2 cell in Map.GetUsedCellsById(cell_type)) {
+            foreach (Vector2 cell in Map.GetUsedCellsById(cell_type))
+            {
                 cells.Add(cell);
             }
         }
@@ -78,7 +79,7 @@ public class MapManager : Singleton<MapManager>
         ));
     }
 
-    public bool CanMoveToCell(Vector2 mapPos)
+    public bool IsCellMoveable(Vector2 mapPos)
     {
         return moveableCells.Contains(mapPos) && !disabledCells.Contains(mapPos);
     }
@@ -110,16 +111,24 @@ public class MapManager : Singleton<MapManager>
         return Map.WorldToMap(worldPos);
     }
 
-    public List<Vector2> GetValidMoves(Vector2 position, int range)
+    public List<Vector2> GetValidMoves(Vector2 currentPosition, int range)
     {
-        List<Vector2> valid_moves = new();
+        List<Vector2> validMoves = new();
         foreach (Vector2 cell in moveableCells)
         {
-            if (cell == position) continue;
-            if (!CanMoveToCell(cell) || GetPathDistance(GetPointPath(position, cell)) > range) continue;
-            valid_moves.Add(cell);
+            if (cell == currentPosition) continue;
+            if (disabledCells.Contains(cell)) continue;
+
+            // Only now calculate the path to the cell
+            List<Vector2> path = GetPointPath(currentPosition, cell);
+
+            // Filter out cells out of range and unreachable
+            var distance = GetPathDistance(path);
+            if (distance == 0 || distance > range) continue;
+
+            validMoves.Add(cell);
         }
-        return valid_moves;
+        return validMoves;
     }
 
     // helpers

@@ -21,7 +21,7 @@ public class Enemy : Entity
 		AddChild(sprite);
 	}
 
-	// @TODO for now just returns the new position to move to
+	// @TODO needs to return an action object.
 	// Player action is also just vector2 passed in
 	public Vector2? GetAction(List<Vector2> playerPath)
 	{
@@ -30,7 +30,7 @@ public class Enemy : Entity
 		bool CanMoveToLocation(Vector2 location)
 		{
 			bool noPlayer = !playerPoints.Contains(location);
-			bool canMove = mapMgr.CanMoveToCell(location);
+			bool canMove = mapMgr.IsCellMoveable(location);
 
 			return noPlayer && canMove;
 		}
@@ -50,11 +50,5 @@ public class Enemy : Entity
 		availableDirections.Shuffle();
 
 		return currentMapPos + availableDirections[0];
-	}
-
-	protected override void OnMoveFinished()
-	{
-		base.OnMoveFinished();
-		mapMgr.SetCellDisabled(currentMapPos, true);
 	}
 }

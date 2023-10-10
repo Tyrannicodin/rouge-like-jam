@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Godot;
-using Godot.Collections;
 
 public class Player : Entity
 {
@@ -29,7 +28,7 @@ public class Player : Entity
         List<Vector2> path = new();
 
         bool withinGrid = targetPos.x < MapManager.GRID_WIDTH && targetPos.y < MapManager.GRID_HEIGHT;
-        bool canMove = mapMgr.CanMoveToCell(targetPos);
+        bool canMove = mapMgr.IsCellMoveable(targetPos);
         bool samePlace = targetPos == currentMapPos;
 
         if (!withinGrid || !canMove || samePlace || moving) return;
@@ -55,9 +54,12 @@ public class Player : Entity
         else if (currentAction == "attack")
         {
             Vector2 direction = targetPos - currentMapPos;
-            if (direction.Abs().x >= direction.Abs().y) {
+            if (direction.Abs().x >= direction.Abs().y)
+            {
                 direction.y = 0;
-            } else {
+            }
+            else
+            {
                 direction.x = 0;
             }
             if (direction == Vector2.Zero) return;
@@ -100,12 +102,13 @@ public class Player : Entity
     private void ClearPoints()
     {
         if (moving) return;
-        pathLine.Points = new Vector2[0];
+        pathLine.Points = System.Array.Empty<Vector2>();
     }
 
     private void HighlightMoves()
     {
-        foreach (Vector2 cell in mapMgr.GetValidMoves(currentMapPos, MOVE_RANGE))
+        var moves = mapMgr.GetValidMoves(currentMapPos, MOVE_RANGE);
+        foreach (Vector2 cell in moves)
         {
             actionOverlay.SetCell((int)cell.x, (int)cell.y, 0);
         }
@@ -116,7 +119,7 @@ public class Player : Entity
         foreach (Vector2 direction in new Vector2[] { Vector2.Up, Vector2.Down, Vector2.Left, Vector2.Right })
         {
             int multiplier = 1;
-            while (multiplier <= ATTACK_RANGE && mapMgr.moveableCells.Contains(currentMapPos + direction * multiplier))
+            while (multiplier <= ATTACK_RANGE && mapMgr.IsCellMoveable(currentMapPos + direction * multiplier))
             {
                 actionOverlay.SetCell((int)(currentMapPos + direction * multiplier).x, (int)(currentMapPos + direction * multiplier).y, 0);
                 multiplier++;

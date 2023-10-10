@@ -9,11 +9,6 @@ public abstract class Entity : Node2D
     // Location on the map in map space
     public Vector2 currentMapPos;
     public bool moving = false;
-    // I need a number of things on every entity
-    // map location
-    // attributes
-    // components
-    // sprite?
 
     public EntityAttributes attributes = new();
 

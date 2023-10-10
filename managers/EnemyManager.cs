@@ -26,7 +26,7 @@ public class EnemyManager : Singleton<EnemyManager>
             };
             enemies.Add(newEnemy);
             AddChild(newEnemy, true);
-            // Disable the new position
+            // Disable the starting position
             mapMgr.SetCellDisabled(position, true);
         }
     }
@@ -44,25 +44,9 @@ public class EnemyManager : Singleton<EnemyManager>
 
             List<Vector2> path = mapMgr.GetPointPath(enemy.currentMapPos, (Vector2)destination);
             enemy.Move(path, 0.2f);
-        }
-    }
 
-
-
-    public override void _Input(InputEvent @event)
-    {
-        if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
-        {
-            if (mouseEvent.ButtonIndex != (int)ButtonList.Right) return;
-
-            Vector2 targetPos = MapManager.Instance.WorldToMap(mouseEvent.Position);
-
-            bool withinGrid = targetPos.x < MapManager.GRID_WIDTH && targetPos.y < MapManager.GRID_HEIGHT;
-
-            if (withinGrid)
-            {
-                MapManager.Instance.SetCellDisabled(targetPos, true);
-            }
+            // Disable it's new position - this is done *instantly* on purpose to prevent any kind of early clicking where an enemy will be.
+            mapMgr.SetCellDisabled((Vector2)destination, true);
         }
     }
 }
