@@ -743,6 +743,4 @@ script = ExtResource( 4 )
 script = ExtResource( 6 )
 enemyPositions = [ Vector2( 5, 5 ), Vector2( 7, 1 ), Vector2( 2, 0 ) ]
 
-[node name="BulletManager" type="Node2D" parent="Managers"]
-
 [connection signal="OnSelectedActionChanged" from="ActionButtons" to="Player" method="ActionSelected"]

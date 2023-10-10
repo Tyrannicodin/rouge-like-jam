@@ -36,11 +36,15 @@ public class Player : Entity
         // Clear the overlay now, we are about to take an action.
         actionOverlay.Clear();
 
-        List<Vector2> path = new();
+        Action chosenAction = Action.None;
 
         if (currentAction == "move")
         {
-            path = mapMgr.GetPointPath(currentMapPos, targetPos);
+            var path = mapMgr.GetPointPath(currentMapPos, targetPos);
+            Move(path, 0.2f);
+
+            // Action is move action
+            chosenAction = new Action(Action.Type.Move, path);
 
             // Movement line - disabled temporarily
             //Vector2[] realArray = new Vector2[path.Count];
@@ -49,22 +53,21 @@ public class Player : Entity
             //    realArray[i] = mapMgr.MapToWorld(path[i]);
             //}
             //pathLine.Points = realArray;
-
-            Move(path, 0.2f);
         }
         else if (currentAction == "attack")
         {
             Shoot(targetPos, 0.2f);
 
-            // @TODO long term this needs to be action not path
-            path.Add(currentMapPos);
+            // Action is shoot action
+            chosenAction = new Action(Action.Type.Shoot, new() { currentMapPos, targetPos });
         }
-        if (path.Count > 0)
+        if (chosenAction.type != Action.Type.None)
         {
-            EnemyManager.Instance.MoveEnemies(path);
+            EnemyManager.Instance.ExecuteEnemyActions(chosenAction);
         }
     }
 
+    // Called by action buttons
     public void ActionSelected(string action)
     {
         actionOverlay.Clear();
@@ -77,7 +80,7 @@ public class Player : Entity
             case "attack":
                 HighlightTargets();
                 break;
-            case "rotate":
+            default:
                 break;
         }
     }
@@ -127,6 +130,8 @@ public class Player : Entity
         pathLine.Points = System.Array.Empty<Vector2>();
     }
 
+
+    // Action highlights
     private void HighlightMoves()
     {
         var moves = mapMgr.GetValidMoves(currentMapPos, MOVE_RANGE);

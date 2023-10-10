@@ -29,8 +29,11 @@ namespace Godot
 
     public struct Action
     {
+        public readonly static Action None = new(Type.None, new());
+
         public enum Type
         {
+            None,
             Move,
             Shoot,
             Repair
@@ -41,7 +44,7 @@ namespace Godot
         /// <summary>
         /// The info this holds is different for each action.
         /// For moving a list of path points to move between.
-        /// For shooting the first vector in the list holds the target tile.
+        /// For shooting the first vector in the list holds the standing position, and the second holds the target position.
         /// For repairs this should be left blank.
         /// </summary>
         public List<Vector2> info;
