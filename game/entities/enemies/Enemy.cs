@@ -4,6 +4,8 @@ using Godot.Collections;
 
 public class Enemy : Entity
 {
+	public override string Id => "enemy";
+
 	protected override Vector2 ColliderSize => new(16, 15);
 
 	public override void EntityReady()
