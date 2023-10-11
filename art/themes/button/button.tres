@@ -1,0 +1,24 @@
+[gd_resource type="Theme" load_steps=6 format=2]
+
+[ext_resource path="res://art/themes/button/un_pressed.tres" type="StyleBox" id=1]
+[ext_resource path="res://art/themes/button/pressed.tres" type="StyleBox" id=2]
+[ext_resource path="res://art/fonts/Poco.ttf" type="DynamicFontData" id=3]
+
+[sub_resource type="DynamicFont" id=1]
+size = 20
+use_mipmaps = true
+extra_spacing_bottom = 10
+font_data = ExtResource( 3 )
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[resource]
+Button/colors/font_color = Color( 0, 0, 1, 1 )
+Button/colors/font_color_focus = Color( 0, 0, 1, 1 )
+Button/colors/font_color_hover = Color( 0, 0, 1, 1 )
+Button/colors/font_color_pressed = Color( 0, 1, 0, 1 )
+Button/fonts/font = SubResource( 1 )
+Button/styles/focus = SubResource( 2 )
+Button/styles/hover = ExtResource( 1 )
+Button/styles/normal = ExtResource( 1 )
+Button/styles/pressed = ExtResource( 2 )

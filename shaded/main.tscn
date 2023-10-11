@@ -12,11 +12,11 @@ uniform vec4 pink;
 void fragment() {
 	vec4 color = texture(TEXTURE, UV).rgba;
 	COLOR = color;
-	if (color.r == 1.0) {
+	if (color.r > .9) {
 		COLOR = pink;
-	} else if (color.g == 1.0) {
+	} else if (color.g > .9) {
 		COLOR = vec4(0.07, 0.01, 0.01, 1.0);
-	} else if (color.b == 1.0) {
+	} else if (color.b > .9) {
 		COLOR = vec4(0.7, 0.78, 0.78, 1.0);
 	}
 }"
