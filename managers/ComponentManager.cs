@@ -53,8 +53,10 @@ public class ComponentManager : Singleton<ComponentManager>
                 Name = componentType.Name,
                 Text = tempComponent.ComponentName,
                 HintTooltip = tempComponent.ComponentDescription,
-                ToggleMode = true
+                ToggleMode = true,
+                Theme = ResourceLoader.Load<Theme>("res://art/themes/button/button.tres")
             };
+            componentButton.AddConstantOverride("font_size", 10);
             componentButton.Connect("pressed", this, "ComponentTypePicked", new Godot.Collections.Array { i });
             ComponentButtons.AddChild(componentButton);
             i++;
