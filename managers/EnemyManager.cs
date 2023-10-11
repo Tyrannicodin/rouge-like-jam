@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public class EnemyManager : Singleton<EnemyManager>
@@ -26,42 +27,25 @@ public class EnemyManager : Singleton<EnemyManager>
             };
             enemies.Add(newEnemy);
             AddChild(newEnemy, true);
-            // Disable the new position
+            // Disable the starting position
             mapMgr.SetCellDisabled(position, true);
         }
     }
 
-    public void MoveEnemies(List<Vector2> playerPath)
+    public void ExecuteEnemyActions(Action playerAction)
     {
         foreach (Enemy enemy in enemies)
         {
+            Action enemyAction = enemy.GetAction(playerAction);
 
-            var destination = enemy.GetAction(playerPath);
-            if (destination == null) continue;
-
-            // Re-enable it's last position
-            mapMgr.SetCellDisabled(enemy.currentMapPos, false);
-
-            List<Vector2> path = mapMgr.GetPointPath(enemy.currentMapPos, (Vector2)destination);
-            enemy.Move(path, 0.2f);
-        }
-    }
-
-
-
-    public override void _Input(InputEvent @event)
-    {
-        if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
-        {
-            if (mouseEvent.ButtonIndex != (int)ButtonList.Right) return;
-
-            Vector2 targetPos = MapManager.Instance.WorldToMap(mouseEvent.Position);
-
-            bool withinGrid = targetPos.x < MapManager.GRID_WIDTH && targetPos.y < MapManager.GRID_HEIGHT;
-
-            if (withinGrid)
+            switch (enemyAction.type)
             {
-                MapManager.Instance.SetCellDisabled(targetPos, true);
+                case Action.Type.Move:
+                    // Move the enemy using the path returned
+                    enemy.Move(enemyAction.info, 0.2f);
+                    break;
+                default:
+                    break;
             }
         }
     }

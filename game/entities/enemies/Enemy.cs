@@ -4,6 +4,8 @@ using Godot.Collections;
 
 public class Enemy : Entity
 {
+	public override string Id => "enemy";
+
 	protected override Vector2 ColliderSize => new(16, 15);
 
 	public override void EntityReady()
@@ -21,16 +23,22 @@ public class Enemy : Entity
 		AddChild(sprite);
 	}
 
-	// @TODO for now just returns the new position to move to
-	// Player action is also just vector2 passed in
-	public Vector2? GetAction(List<Vector2> playerPath)
+	public Action GetAction(Action playerAction)
 	{
-		List<Vector2> playerPoints = MapManager.PathToPoints(playerPath);
+		List<Vector2> noEntryCells = playerAction.type switch
+		{
+			Action.Type.Move => MapManager.PathToPoints(playerAction.info),
+			Action.Type.Shoot => new() { playerAction.info[0] },
+			_ => new(),
+		};
+
+		// Here is where enemy will decide what to do depending on the player action
+		// For now just moe randomly
 
 		bool CanMoveToLocation(Vector2 location)
 		{
-			bool noPlayer = !playerPoints.Contains(location);
-			bool canMove = mapMgr.CanMoveToCell(location);
+			bool noPlayer = !noEntryCells.Contains(location);
+			bool canMove = mapMgr.IsCellMoveable(location);
 
 			return noPlayer && canMove;
 		}
@@ -46,15 +54,19 @@ public class Enemy : Entity
 			}
 		}
 
-		if (availableDirections.Count == 0) return null;
+		if (availableDirections.Count == 0) return Action.None;
 		availableDirections.Shuffle();
 
-		return currentMapPos + availableDirections[0];
-	}
 
-	protected override void OnMoveFinished()
-	{
-		base.OnMoveFinished();
-		mapMgr.SetCellDisabled(currentMapPos, true);
+		// Re-enable our last position
+		mapMgr.SetCellDisabled(currentMapPos, false);
+
+		List<Vector2> ourPath = mapMgr.GetPointPath(currentMapPos, currentMapPos + availableDirections[0]);
+
+		// Disable the final position - this is done *instantly* on purpose to prevent any kind of early clicking where an enemy will be.
+		mapMgr.SetCellDisabled(currentMapPos + availableDirections[0], true);
+
+		// Return a move action
+		return new Action(Action.Type.Move, ourPath);
 	}
 }

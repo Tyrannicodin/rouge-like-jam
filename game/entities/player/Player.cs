@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Godot;
-using Godot.Collections;
 
 public class Player : Entity
 {
@@ -12,6 +11,8 @@ public class Player : Entity
 
     protected override Vector2 ColliderSize => new(16, 15);
 
+    public override string Id => "player";
+
     public override void _Ready()
     {
         base._Ready();
@@ -22,55 +23,51 @@ public class Player : Entity
 
     public override void _Input(InputEvent @event)
     {
+        if (actionInProgress) return;
+
         if (!(@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)) return;
         if (mouseEvent.ButtonIndex != (int)ButtonList.Left) return;
 
         Vector2 targetPos = mapMgr.WorldToMap(mouseEvent.Position);
-        List<Vector2> path = new();
 
-        bool withinGrid = targetPos.x < MapManager.GRID_WIDTH && targetPos.y < MapManager.GRID_HEIGHT;
-        bool canMove = mapMgr.CanMoveToCell(targetPos);
-        bool samePlace = targetPos == currentMapPos;
+        bool hasOverlayCell = actionOverlay.GetCellv(targetPos) != TileMap.InvalidCell;
+        if (!hasOverlayCell) return;
 
-        if (!withinGrid || !canMove || samePlace || moving) return;
+        // Clear the overlay now, we are about to take an action.
+        actionOverlay.Clear();
+
+        Action chosenAction = Action.None;
+
         if (currentAction == "move")
         {
-            path = mapMgr.GetPointPath(currentMapPos, targetPos);
-            // @TODO temporary limit to move distance
-            if (MapManager.GetPathDistance(path) > MOVE_RANGE || path.Count == 0)
-            {
-                return;
-            }
-
-            Vector2[] realArray = new Vector2[path.Count];
-            for (int i = 0; i < path.Count; i++)
-            {
-                realArray[i] = mapMgr.MapToWorld(path[i]);
-            }
-            pathLine.Points = realArray;
-            actionOverlay.Clear();
-
+            var path = mapMgr.GetPointPath(currentMapPos, targetPos);
             Move(path, 0.2f);
+
+            // Action is move action
+            chosenAction = new Action(Action.Type.Move, path);
+
+            // Movement line - disabled temporarily
+            //Vector2[] realArray = new Vector2[path.Count];
+            //for (int i = 0; i < path.Count; i++)
+            //{
+            //    realArray[i] = mapMgr.MapToWorld(path[i]);
+            //}
+            //pathLine.Points = realArray;
         }
         else if (currentAction == "attack")
         {
-            Vector2 direction = targetPos - currentMapPos;
-            if (direction.Abs().x >= direction.Abs().y) {
-                direction.y = 0;
-            } else {
-                direction.x = 0;
-            }
-            if (direction == Vector2.Zero) return;
-            BulletManager.Instance.Shoot(currentMapPos, direction.Normalized());
-            path = new() { currentMapPos };
+            Shoot(targetPos, 0.2f);
+
+            // Action is shoot action
+            chosenAction = new Action(Action.Type.Shoot, new() { currentMapPos, targetPos });
         }
-        if (path.Count > 0)
+        if (chosenAction.type != Action.Type.None)
         {
-            EnemyManager.Instance.MoveEnemies(path);
-            BulletManager.Instance.MoveBullets(path);
+            EnemyManager.Instance.ExecuteEnemyActions(chosenAction);
         }
     }
 
+    // Called by action buttons
     public void ActionSelected(string action)
     {
         actionOverlay.Clear();
@@ -81,9 +78,9 @@ public class Player : Entity
                 HighlightMoves();
                 break;
             case "attack":
-                HighlightDirections();
+                HighlightTargets();
                 break;
-            case "rotate":
+            default:
                 break;
         }
     }
@@ -96,30 +93,78 @@ public class Player : Entity
         SceneTreeTimer timer = GetTree().CreateTimer(0.2f);
         timer.Connect("timeout", this, nameof(ClearPoints));
     }
+    protected override void OnShootFinished()
+    {
+        base.OnShootFinished();
+        HighlightTargets();
+    }
+
+    public override void OnBulletHit(Node node)
+    {
+        if (currentBullet == null) return;
+        actionInProgress = false;
+
+        // The bullet hit something, determine what it is
+        if (node is Enemy enemy)
+        {
+            GD.Print("hit enemy, destroying bullet");
+            DestroyBullet();
+            HighlightTargets();
+        }
+        else if (node is Bullet bullet)
+        {
+            GD.Print("hit bullet, destroying both");
+            DestroyBullet();
+            bullet.parentEntity.DestroyBullet();
+            HighlightTargets();
+        }
+        else
+        {
+            //@TODO other collisions?
+        }
+    }
 
     private void ClearPoints()
     {
-        if (moving) return;
-        pathLine.Points = new Vector2[0];
+        if (actionInProgress) return;
+        pathLine.Points = System.Array.Empty<Vector2>();
     }
 
+
+    // Action highlights
     private void HighlightMoves()
     {
-        foreach (Vector2 cell in mapMgr.GetValidMoves(currentMapPos, MOVE_RANGE))
+        var moves = mapMgr.GetValidMoves(currentMapPos, MOVE_RANGE);
+        foreach (Vector2 cell in moves)
         {
             actionOverlay.SetCell((int)cell.x, (int)cell.y, 0);
         }
     }
 
-    private void HighlightDirections()
+    private void HighlightTargets()
     {
         foreach (Vector2 direction in new Vector2[] { Vector2.Up, Vector2.Down, Vector2.Left, Vector2.Right })
         {
             int multiplier = 1;
-            while (multiplier <= ATTACK_RANGE && mapMgr.moveableCells.Contains(currentMapPos + direction * multiplier))
+            while (true)
             {
-                actionOverlay.SetCell((int)(currentMapPos + direction * multiplier).x, (int)(currentMapPos + direction * multiplier).y, 0);
+                Vector2 targetCell = currentMapPos + (direction * multiplier);
+                if (mapMgr.disabledCells.Contains(targetCell))
+                {
+                    // There's an enemy here, highlight it but then stop.
+                    actionOverlay.SetCellv(targetCell, 0);
+                    break;
+                }
+                else if (!mapMgr.moveableCells.Contains(targetCell))
+                {
+                    // It's an immovable cell, stop immediately without adding it as an option to shoot at.
+                    break;
+                }
+
+                actionOverlay.SetCellv(targetCell, 0);
+
                 multiplier++;
+                if (multiplier > ATTACK_RANGE) break;
             }
         }
     }
